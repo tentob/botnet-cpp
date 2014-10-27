@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
 Plugin::Plugin(char* path) {
-    this->path = path;
+    this->path = realpath(path, NULL); 
     load();    
 }
 
@@ -28,7 +28,7 @@ char* Plugin::getPath() {
 }
 
 void Plugin::setPath(char* path) {
-    this->path = path;
+    this->path = realpath(path, NULL); 
 }
 
 void* Plugin::func(char* name) {

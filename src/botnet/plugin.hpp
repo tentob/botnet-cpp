@@ -5,6 +5,7 @@
 #include <link.h>
 #include <algorithm>
 #include <vector>
+#include <stdlib.h>
 
 struct Plugin {
 public:
