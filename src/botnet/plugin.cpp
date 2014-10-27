@@ -6,6 +6,7 @@ Plugin::Plugin(char* path) {
 }
 
 Plugin::~Plugin() {
+    free(path);
     unload();
 }
 
@@ -28,6 +29,7 @@ char* Plugin::getPath() {
 }
 
 void Plugin::setPath(char* path) {
+    free(this->path);
     this->path = realpath(path, NULL); 
 }
 
