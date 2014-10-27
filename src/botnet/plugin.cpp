@@ -23,6 +23,14 @@ void Plugin::load() {
     }
 }
 
+char* Plugin::getPath() {
+    return path;
+}
+
+void Plugin::setPath(char* path) {
+    this->path = path;
+}
+
 void* Plugin::func(char* name) {
     void* func = dlsym(handle, name);
     if (!func) {

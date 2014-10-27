@@ -16,6 +16,8 @@ public:
     std::vector<char*> getSymbols(); 
     void unload();
     void load();
+    char* getPath();
+    void setPath(char* path);
 private:
     void regen_symbols();
     size_t findVal(ElfW(Dyn)* dyn, ElfW(Sxword) tag);
