@@ -1,32 +1,8 @@
 #include "plugin.hpp"
 
 Plugin::Plugin(char* path) {
-    handle = dlopen(path, RTLD_LOCAL | RTLD_NOW);
-    if(!handle) {
-        std::cerr << "Couldnt load plugin" << std::endl;
-        return;
-    }
-    struct link_map* map = 0;
-    if(dlinfo(handle, RTLD_DI_LINKMAP, &map)) {
-        std::cerr << "Couldnt generate link_map" << std::endl;
-        return;
-    }
-    ElfW(Dyn)* dyn_start = map->l_ld;
-    size_t symentsize = findVal(dyn_start, DT_SYMENT);
-    ElfW(Sym)* syment = (ElfW(Sym)*) findVal(dyn_start, DT_SYMTAB);
-    if(syment == NULL) {
-        std::cerr << "Couldnt get syment" << std::endl;
-    }
-    char* strtab = (char*) findPtr(dyn_start, DT_STRTAB);
-
-    while(syment != NULL) {
-        if(syment->st_name > 0x1000000)
-            break;
-        if(syment->st_size) {
-            symbols.push_back(&strtab[syment->st_name]);
-        }
-        syment = (ElfW(Sym)*)((uint8_t*)syment + symentsize);
-    }
+    this->path = path;
+    load();    
 }
 
 Plugin::~Plugin() {
@@ -36,6 +12,15 @@ Plugin::~Plugin() {
 void Plugin::unload() {
     if(handle)
         dlclose(handle);
+}
+
+void Plugin::load() {
+    if(path) {
+        handle = dlopen(path, RTLD_LOCAL | RTLD_NOW);
+        if(!handle)
+            std::cerr << "Couldnt load plugin" << std::endl; 
+        else regen_symbols();
+    }
 }
 
 void* Plugin::func(char* name) {
@@ -73,3 +58,28 @@ void* Plugin::findPtr(ElfW(Dyn)* dyn, ElfW(Sxword) tag) {
     return 0;
 }
 
+
+void Plugin::regen_symbols() {
+    symbols.clear();
+    struct link_map* map = 0;
+    if(dlinfo(handle, RTLD_DI_LINKMAP, &map)) {
+        std::cerr << "Couldnt generate link_map" << std::endl;
+        return;
+    }
+    ElfW(Dyn)* dyn_start = map->l_ld;
+    size_t symentsize = findVal(dyn_start, DT_SYMENT);
+    ElfW(Sym)* syment = (ElfW(Sym)*) findVal(dyn_start, DT_SYMTAB);
+    if(syment == NULL) {
+        std::cerr << "Couldnt get syment" << std::endl;
+    }
+    char* strtab = (char*) findPtr(dyn_start, DT_STRTAB);
+
+    while(syment != NULL) {
+        if(syment->st_name > 0x1000000)
+            break;
+        if(syment->st_size) {
+            symbols.push_back(&strtab[syment->st_name]);
+        }
+        syment = (ElfW(Sym)*)((uint8_t*)syment + symentsize);
+    }
+}
