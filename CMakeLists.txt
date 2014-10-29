@@ -8,5 +8,5 @@ aux_source_directory("${CMAKE_CURRENT_SOURCE_DIR}/src/botnet" SRC_LIST)
 
 # Build & Link
 add_executable(${PROJECT_NAME} ${SRC_LIST})
-target_link_libraries(${PROJECT_NAME} dl)
+target_link_libraries(${PROJECT_NAME} dl boost_program_options)
 

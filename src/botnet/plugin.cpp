@@ -81,6 +81,7 @@ void Plugin::regen_symbols() {
     ElfW(Sym)* syment = (ElfW(Sym)*) findVal(dyn_start, DT_SYMTAB);
     if(syment == NULL) {
         std::cerr << "Couldnt get syment" << std::endl;
+        return;
     }
     char* strtab = (char*) findPtr(dyn_start, DT_STRTAB);
 
